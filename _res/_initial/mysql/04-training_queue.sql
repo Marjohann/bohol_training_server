@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.59, for Win64 (AMD64)
+-- MySQL dump 10.13  Distrib 5.7.42, for Linux (x86_64)
 --
 -- Host: localhost    Database: training_queue
 -- ------------------------------------------------------
--- Server version	5.5.59
+-- Server version	5.7.42-0ubuntu0.18.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -42,6 +42,15 @@ CREATE TABLE `queue_announcement` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `queue_announcement`
+--
+
+LOCK TABLES `queue_announcement` WRITE;
+/*!40000 ALTER TABLE `queue_announcement` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_announcement` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `queue_counter`
 --
 
@@ -55,6 +64,15 @@ CREATE TABLE `queue_counter` (
   UNIQUE KEY `uix_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `queue_counter`
+--
+
+LOCK TABLES `queue_counter` WRITE;
+/*!40000 ALTER TABLE `queue_counter` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_counter` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `queue_counter_section`
@@ -74,6 +92,15 @@ CREATE TABLE `queue_counter_section` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `queue_counter_section`
+--
+
+LOCK TABLES `queue_counter_section` WRITE;
+/*!40000 ALTER TABLE `queue_counter_section` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_counter_section` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `queue_group`
 --
 
@@ -86,6 +113,15 @@ CREATE TABLE `queue_group` (
   PRIMARY KEY (`objid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `queue_group`
+--
+
+LOCK TABLES `queue_group` WRITE;
+/*!40000 ALTER TABLE `queue_group` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_group` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `queue_number`
@@ -110,6 +146,15 @@ CREATE TABLE `queue_number` (
   CONSTRAINT `fk_queue_number_sectionid` FOREIGN KEY (`sectionid`) REFERENCES `queue_section` (`objid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `queue_number`
+--
+
+LOCK TABLES `queue_number` WRITE;
+/*!40000 ALTER TABLE `queue_number` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_number` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `queue_number_archive`
@@ -147,6 +192,15 @@ CREATE TABLE `queue_number_archive` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `queue_number_archive`
+--
+
+LOCK TABLES `queue_number_archive` WRITE;
+/*!40000 ALTER TABLE `queue_number_archive` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_number_archive` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `queue_number_counter`
 --
 
@@ -162,6 +216,15 @@ CREATE TABLE `queue_number_counter` (
   CONSTRAINT `fk_queue_number_counter_objid` FOREIGN KEY (`objid`) REFERENCES `queue_number` (`objid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `queue_number_counter`
+--
+
+LOCK TABLES `queue_number_counter` WRITE;
+/*!40000 ALTER TABLE `queue_number_counter` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_number_counter` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `queue_section`
@@ -186,6 +249,15 @@ CREATE TABLE `queue_section` (
   CONSTRAINT `queue_section_ibfk_1` FOREIGN KEY (`groupid`) REFERENCES `queue_group` (`objid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `queue_section`
+--
+
+LOCK TABLES `queue_section` WRITE;
+/*!40000 ALTER TABLE `queue_section` DISABLE KEYS */;
+/*!40000 ALTER TABLE `queue_section` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -196,4 +268,4 @@ CREATE TABLE `queue_section` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-07-08 22:46:52
+-- Dump completed on 2025-06-26  2:34:50

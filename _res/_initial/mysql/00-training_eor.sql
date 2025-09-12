@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.1.73, for Win64 (unknown)
+-- MySQL dump 10.13  Distrib 5.7.42, for Linux (x86_64)
 --
 -- Host: localhost    Database: training_eor
 -- ------------------------------------------------------
--- Server version	5.7.39-log
+-- Server version	5.7.42-0ubuntu0.18.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -530,7 +530,6 @@ CREATE TABLE `fund` (
 
 LOCK TABLES `fund` WRITE;
 /*!40000 ALTER TABLE `fund` DISABLE KEYS */;
-INSERT INTO `fund` VALUES ('GENERAL','ACTIVE','01','GENERAL-PROPER','subfund',1,1,'GENERAL','GENERAL','GENERAL',0),('SEF','ACTIVE','02','SEF-PROPER','subfund',1,1,'SEF','SEF','SEF',1),('TRUST','ACTIVE','03','TRUST-PROPER','subfund',1,1,'TRUST','TRUST','TRUST',2);
 /*!40000 ALTER TABLE `fund` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -715,130 +714,6 @@ INSERT INTO `sys_email_template` VALUES ('eor','EOR No ${receiptno}','Dear value
 UNLOCK TABLES;
 
 --
--- Table structure for table `sys_message_queue`
---
-
-DROP TABLE IF EXISTS `sys_message_queue`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `sys_message_queue` (
-  `objid` varchar(50) NOT NULL,
-  `state` int(4) DEFAULT NULL,
-  `dtsent` datetime DEFAULT NULL,
-  `email` varchar(355) DEFAULT NULL,
-  `mobileno` varchar(50) DEFAULT NULL,
-  `subject` varchar(255) DEFAULT NULL,
-  `message` mediumtext,
-  `errmsg` varchar(255) DEFAULT NULL,
-  `connection` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`objid`),
-  KEY `ix_state` (`state`),
-  KEY `ix_dtsent` (`dtsent`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `sys_message_queue`
---
-
-LOCK TABLES `sys_message_queue` WRITE;
-/*!40000 ALTER TABLE `sys_message_queue` DISABLE KEYS */;
-/*!40000 ALTER TABLE `sys_message_queue` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `sys_message_template`
---
-
-DROP TABLE IF EXISTS `sys_message_template`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `sys_message_template` (
-  `objid` varchar(50) NOT NULL,
-  `statement` mediumtext,
-  `subject` varchar(255) DEFAULT NULL,
-  `message` mediumtext,
-  `emailfield` varchar(255) DEFAULT NULL,
-  `mobilenofield` varchar(255) DEFAULT NULL,
-  `connection` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`objid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `sys_message_template`
---
-
-LOCK TABLES `sys_message_template` WRITE;
-/*!40000 ALTER TABLE `sys_message_template` DISABLE KEYS */;
-/*!40000 ALTER TABLE `sys_message_template` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `sys_report_def`
---
-
-DROP TABLE IF EXISTS `sys_report_def`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `sys_report_def` (
-  `name` varchar(100) NOT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `category` varchar(255) DEFAULT NULL,
-  `template` varchar(255) DEFAULT NULL,
-  `reportheader` varchar(100) DEFAULT NULL,
-  `role` varchar(50) DEFAULT NULL,
-  `sortorder` int(11) DEFAULT NULL,
-  `statement` longtext,
-  `permission` varchar(100) DEFAULT NULL,
-  `parameters` text,
-  `querytype` varchar(50) DEFAULT NULL,
-  `state` varchar(10) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `properties` text,
-  `paramhandler` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`name`),
-  KEY `ix_template` (`template`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `sys_report_def`
---
-
-LOCK TABLES `sys_report_def` WRITE;
-/*!40000 ALTER TABLE `sys_report_def` DISABLE KEYS */;
-/*!40000 ALTER TABLE `sys_report_def` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `sys_report_template`
---
-
-DROP TABLE IF EXISTS `sys_report_template`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `sys_report_template` (
-  `name` varchar(100) NOT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `filepath` varchar(255) NOT NULL,
-  `master` int(1) DEFAULT NULL,
-  `icon` mediumblob,
-  PRIMARY KEY (`name`),
-  UNIQUE KEY `uix_filepath` (`filepath`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `sys_report_template`
---
-
-LOCK TABLES `sys_report_template` WRITE;
-/*!40000 ALTER TABLE `sys_report_template` DISABLE KEYS */;
-/*!40000 ALTER TABLE `sys_report_template` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `unpostedpayment`
 --
 
@@ -890,22 +765,21 @@ DROP TABLE IF EXISTS `vw_remittance_eor_item`;
 /*!50001 DROP VIEW IF EXISTS `vw_remittance_eor_item`*/;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-/*!50001 CREATE TABLE `vw_remittance_eor_item` (
- `remittanceid` tinyint NOT NULL,
-  `remittance_controldate` tinyint NOT NULL,
-  `remittance_controlno` tinyint NOT NULL,
-  `receiptid` tinyint NOT NULL,
-  `receiptdate` tinyint NOT NULL,
-  `receiptno` tinyint NOT NULL,
-  `paidby` tinyint NOT NULL,
-  `paidbyaddress` tinyint NOT NULL,
-  `fundid` tinyint NOT NULL,
-  `acctid` tinyint NOT NULL,
-  `acctcode` tinyint NOT NULL,
-  `acctname` tinyint NOT NULL,
-  `remarks` tinyint NOT NULL,
-  `amount` tinyint NOT NULL
-) ENGINE=MyISAM */;
+/*!50001 CREATE VIEW `vw_remittance_eor_item` AS SELECT 
+ 1 AS `remittanceid`,
+ 1 AS `remittance_controldate`,
+ 1 AS `remittance_controlno`,
+ 1 AS `receiptid`,
+ 1 AS `receiptdate`,
+ 1 AS `receiptno`,
+ 1 AS `paidby`,
+ 1 AS `paidbyaddress`,
+ 1 AS `fundid`,
+ 1 AS `acctid`,
+ 1 AS `acctcode`,
+ 1 AS `acctname`,
+ 1 AS `remarks`,
+ 1 AS `amount`*/;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -916,26 +790,25 @@ DROP TABLE IF EXISTS `vw_remittance_eor_share`;
 /*!50001 DROP VIEW IF EXISTS `vw_remittance_eor_share`*/;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-/*!50001 CREATE TABLE `vw_remittance_eor_share` (
- `remittanceid` tinyint NOT NULL,
-  `remittance_controldate` tinyint NOT NULL,
-  `remittance_controlno` tinyint NOT NULL,
-  `receiptid` tinyint NOT NULL,
-  `receiptdate` tinyint NOT NULL,
-  `receiptno` tinyint NOT NULL,
-  `paidby` tinyint NOT NULL,
-  `paidbyaddress` tinyint NOT NULL,
-  `refacctid` tinyint NOT NULL,
-  `refacctcode` tinyint NOT NULL,
-  `refaccttitle` tinyint NOT NULL,
-  `reffundid` tinyint NOT NULL,
-  `acctid` tinyint NOT NULL,
-  `acctcode` tinyint NOT NULL,
-  `acctname` tinyint NOT NULL,
-  `fundid` tinyint NOT NULL,
-  `amount` tinyint NOT NULL,
-  `txntype` tinyint NOT NULL
-) ENGINE=MyISAM */;
+/*!50001 CREATE VIEW `vw_remittance_eor_share` AS SELECT 
+ 1 AS `remittanceid`,
+ 1 AS `remittance_controldate`,
+ 1 AS `remittance_controlno`,
+ 1 AS `receiptid`,
+ 1 AS `receiptdate`,
+ 1 AS `receiptno`,
+ 1 AS `paidby`,
+ 1 AS `paidbyaddress`,
+ 1 AS `refacctid`,
+ 1 AS `refacctcode`,
+ 1 AS `refaccttitle`,
+ 1 AS `reffundid`,
+ 1 AS `acctid`,
+ 1 AS `acctcode`,
+ 1 AS `acctname`,
+ 1 AS `fundid`,
+ 1 AS `amount`,
+ 1 AS `txntype`*/;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -948,7 +821,6 @@ USE `training_eor`;
 -- Final view structure for view `vw_remittance_eor_item`
 --
 
-/*!50001 DROP TABLE IF EXISTS `vw_remittance_eor_item`*/;
 /*!50001 DROP VIEW IF EXISTS `vw_remittance_eor_item`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -967,7 +839,6 @@ USE `training_eor`;
 -- Final view structure for view `vw_remittance_eor_share`
 --
 
-/*!50001 DROP TABLE IF EXISTS `vw_remittance_eor_share`*/;
 /*!50001 DROP VIEW IF EXISTS `vw_remittance_eor_share`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -991,4 +862,4 @@ USE `training_eor`;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-03-01 11:53:51
+-- Dump completed on 2025-06-26  2:33:09
