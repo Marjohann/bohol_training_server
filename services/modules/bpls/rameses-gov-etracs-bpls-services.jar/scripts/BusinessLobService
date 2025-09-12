@@ -39,7 +39,7 @@ public class BusinessLobService  {
 	//allow only to remove per application
 	@ProxyMethod
 	public def getAppLobs(def o) {
-		if(!o.applicationid) throw new Exception("applicationid is required");
+		if ( !o.applicationid ) throw new Exception("applicationid is required");
 		return applob_db.getList( o );
 	}
 

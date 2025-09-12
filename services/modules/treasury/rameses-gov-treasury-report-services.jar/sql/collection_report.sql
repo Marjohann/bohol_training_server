@@ -216,6 +216,48 @@ order by t1.indexno, t1.code, t1.title
 
 
 [getReportSummary]
+select t0.* 
+from (
+  select 
+    day(r.controldate) as xdate, 
+    fund.objid as fund_objid,
+    fund.title as fund_title, 
+    sum(rf.amount) as amount 
+  from remittance r 
+    inner join collectionvoucher cv on cv.objid = r.collectionvoucherid 
+    inner join remittance_fund rf on rf.remittanceid = r.objid 
+    inner join fund on fund.objid = rf.fund_objid 
+  where 1=1 
+    and 'BY_REMITTANCE_DATE' = $P{postingtypeid} 
+    and r.controldate >= $P{startdate} 
+    and r.controldate <  $P{enddate} 
+    and r.collector_objid like $P{collectorid} 
+    and cv.state = 'POSTED' 
+  group by day(r.controldate), fund.objid, fund.title 
+  
+  union 
+
+  select  
+    day(cv.controldate) as xdate, 
+    fund.objid as fund_objid,
+    fund.title as fund_title, 
+    sum(rf.amount) as amount 
+  from collectionvoucher cv 
+    inner join remittance r on r.collectionvoucherid = cv.objid 
+    inner join remittance_fund rf on rf.remittanceid = r.objid
+    inner join fund on fund.objid = rf.fund_objid 
+  where 1=1 
+    and 'BY_LIQUIDATION_DATE' = $P{postingtypeid} 
+    and cv.controldate >= $P{startdate} 
+    and cv.controldate <  $P{enddate} 
+    and r.collector_objid like $P{collectorid}     
+    and cv.state = 'POSTED' 
+  group by day(cv.controldate), fund.objid, fund.title 
+)t0  
+order by t0.xdate, t0.fund_title  
+
+
+[getReportSummary_bak1]
 select t.xdate, ${sqlqry} 
 from (
   select 

@@ -26,6 +26,9 @@ public class BPApplication {
     int lastqtrpaid;
     boolean online; 
 
+    String bin;
+
+
     /** Creates a new instance of BPApplication */
     public BPApplication() {
     }
@@ -88,5 +91,7 @@ public class BPApplication {
         if ( app.onlineapplication?.objid ) {
             this.online = true; 
         }
+
+        bin = app.business?.bin;
     }
 }

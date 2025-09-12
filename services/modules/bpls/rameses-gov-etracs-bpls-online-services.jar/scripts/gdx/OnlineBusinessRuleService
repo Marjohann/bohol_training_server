@@ -4,11 +4,18 @@ import java.rmi.server.UID;
 
 class OnlineBusinessRuleService {
 
+	@Env 
+	def env; 
+
 	@Service( dynamic=true )
 	def dynaSvc; 
 
+	@DataContext( dynamic=true )
+	def dynaEm; 
+
 	@ProxyMethod
 	public Map getInfos( Map param ) {
+		init();
 		validate( param, 'getInfos' );
 		resolveAddress( param.address ); 
 
@@ -38,6 +45,7 @@ class OnlineBusinessRuleService {
 
 	@ProxyMethod
 	public List getRequirements( param ) {
+		init();
 		validate( param, 'getRequirements' );
 		resolveAddress( param.address ); 
 
@@ -81,26 +89,57 @@ class OnlineBusinessRuleService {
 		if ( !param.appdate ) throw new Exception("'appdate'  parameter is required in "+ callingMethodName);
 		if ( !param.tradename ) throw new Exception("'tradename'  parameter is required in "+ callingMethodName);
 		if ( !param.businessname ) throw new Exception("'businessname'  parameter is required in "+ callingMethodName);
+
+		if ( param.apptype == 'RENEW' ) {
+			if ( !param.address ) {
+				param.address = param.businessaddress; 
+			}
+			if ( param.address instanceof String ) {
+				param.address = [text: param.address]; 
+			}
+
+			if ( param.orgtype instanceof String ) {
+				param.orgtype = [ id: param.orgtype ];
+			} 
+		}
+
 		if ( !param.address ) throw new Exception("'address'  parameter is required in "+ callingMethodName);
 		if ( !param.orgtype?.id ) throw new Exception("'orgtype.id'  parameter is required in "+ callingMethodName);
-		if ( !param.primarylob?.objid ) throw new Exception("'primarylob'  parameter is required in "+ callingMethodName);
 
-		def lobs = [ param.primarylob ];
+
+		if ( param.apptype == 'RENEW' ) {
+			// no checking of primarylob, 
+			// since renewal is still using the old facility 
+			// later this will be updated
+			def lobEm = dynaEm.lookup('lob'); 
+			param.lobs.each{ o-> 
+				def lob = lobEm.find([ objid: o.lob.objid ]).first(); 
+				if ( lob ) o.lob = lob; 
+			}
+		} 
+		else if ( !param.primarylob?.objid ) { 
+			throw new Exception("'primarylob'  parameter is required in "+ callingMethodName);
+		}
+
+		def lobs = []; 
+		if ( param.primarylob ) { 
+			lobs << param.primarylob; 
+		}
 		if ( param.lobs instanceof List ) {
 			lobs.addAll( param.lobs ); 
-		}		
+		} 
 
 		lobs.eachWithIndex{ o,idx-> 
 			if ( !(o.lob instanceof Map ))
 				throw new Exception("'lobs["+ idx +"].lob.objid'  parameter is required in "+ callingMethodName);
 			if ( !o.lob?.objid )
-				throw new Exception("'lobs["+ idx +"].objid'  parameter is required in "+ callingMethodName);
+				throw new Exception("'lobs["+ idx +"].lob.objid'  parameter is required in "+ callingMethodName);
 			if ( !o.lob?.name )
-				throw new Exception("'lobs["+ idx +"].name'  parameter is required in "+ callingMethodName);
+				throw new Exception("'lobs["+ idx +"].lob.name'  parameter is required in "+ callingMethodName);
 			if ( !(o.lob?.classification instanceof Map ))
-				throw new Exception("'lobs["+ idx +"].classification.objid'  parameter is required in "+ callingMethodName);
+				throw new Exception("'lobs["+ idx +"].lob.classification.objid'  parameter is required in "+ callingMethodName);
 			if ( !o.lob?.classification?.objid )
-				throw new Exception("'lobs["+ idx +"].classification.objid'  parameter is required in "+ callingMethodName);
+				throw new Exception("'lobs["+ idx +"].lob.classification.objid'  parameter is required in "+ callingMethodName);
 		}
 
 		param.orgtypeid = param.orgtype.id.toString().toUpperCase(); 
@@ -144,7 +183,8 @@ class OnlineBusinessRuleService {
 		map.txnmode = 'ONLINE'; 
 		map.lobs = [];
 
-		def lobs = [ app.primarylob ]; 
+		def lobs = []; 
+		if ( app.primarylob ) lobs << app.primarylob; 
 		if ( app.lobs ) lobs.addAll( app.lobs ); 
 
 		lobs.each{
@@ -158,5 +198,11 @@ class OnlineBusinessRuleService {
 		}
 
 		return map;
+	}
+
+	void init() { 
+		if ( !env.CLIENTTYPE ) { 
+			env.CLIENTTYPE = 'gdx'; 
+		}
 	}
 } 

@@ -33,7 +33,7 @@ set JAVA_OPT="-Xms512m -Xmx%JAVA_OPT_XMX%m -Dosiris.run.dir=%RUN_DIR% -Dosiris.b
 
 echo .=================================================================
 echo .
-echo . Osiris3 Server (ETRACS)
+echo . Training Server (ETRACS)
 echo .
 echo . JAVA      : %JAVA% 
 echo . JAVA_HOME : %JAVA_HOME% 

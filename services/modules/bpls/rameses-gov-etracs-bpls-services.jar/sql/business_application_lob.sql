@@ -3,13 +3,12 @@ SELECT
 	bl.*, 
 	lc.name AS classification_name, 
 	lc.objid as classification_objid, 
-	lob.psicid, sc.code psic_code, 
-	sc.description as psic_description 
+	lob.psicid, lob.psic_code, 
+	lob.psic_description 
 FROM business_application_lob bl
 	INNER JOIN business b ON b.objid = bl.businessid
-	INNER JOIN lob ON lob.objid = bl.lobid 
+	INNER JOIN vw_lob lob ON lob.objid = bl.lobid 
 	INNER JOIN lobclassification lc ON lc.objid = lob.classification_objid 
-	left join psic_subclass sc on sc.code = lob.psicid 
 WHERE bl.applicationid = $P{applicationid} 
 
 

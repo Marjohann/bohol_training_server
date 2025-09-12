@@ -93,3 +93,18 @@ from (
 )t1, business_application_task tsk 
 where tsk.objid = t1.objid 
 order by tsk.parentprocessid 
+
+[findTask]
+select * 
+from business_application_task 
+where objid = $P{processid} 
+
+[getClosedTasks]
+select t.* 
+from business_application_task t 
+	left join business_application_task c on c.parentprocessid = t.objid 
+where t.refid = $P{refid} 
+	and t.assignee_objid is not null 
+	and t.enddate is not null 
+	and c.objid is null 
+order by t.startdate, t.parentprocessid, t.enddate 

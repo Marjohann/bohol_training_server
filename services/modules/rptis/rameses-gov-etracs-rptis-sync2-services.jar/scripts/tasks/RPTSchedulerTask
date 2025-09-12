@@ -17,7 +17,7 @@ class RPTSchedulerTask {
     @Service('Var')
     def var;    
 
-	@Schedule(interval=10)
+	// @Schedule(interval=10)
 	public void processForSync(task) {
         if (!util.toBoolean(var.fileserver_upload_task_active, true)) {
             return;

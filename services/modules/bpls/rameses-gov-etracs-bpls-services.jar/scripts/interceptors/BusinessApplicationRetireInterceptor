@@ -38,11 +38,11 @@ public class BusinessApplicationRetireInterceptor {
 	@After(pattern="BusinessApplicationService.initNew", eval="#{args[0].apptype=='RETIRE' && args[0].txnmode == 'ONLINE'}")
 	public void initNew(def evt) { 
 		def app = evt.result;
-		if(!app.business?.objid) throw new Exception("Please specify a business");
+		if ( !app.business?.objid ) throw new Exception("Please specify a business");
 
 		def apps = business_application.getOpenApplications( [businessid: app.business.objid, filter: '' ] );
-		if(apps.size() > 0 ) throw new Exception("An application for this business is currently being processed");
-
+		if ( apps.size() > 0 ) throw new Exception("An application for this business is currently being processed");
+ 
 		app.objid = 'BARET'+ new java.rmi.server.UID(); 
 
 		//retrieve business first
@@ -60,7 +60,7 @@ public class BusinessApplicationRetireInterceptor {
 		if(b.activeyear<(currentYear-1))
 			throw new Exception("This business has delinquency for previous years. Please go to Assessor's office to process delinquency");
 
-		def balinfo = business_receivable.findUnpaidBalance([applicationid: b.currentapplicationid]); 
+		def balinfo = business_receivable.findUnpaidBalance([ businessid: b.objid ]); 
 		if ( balinfo?.balance > 0.0) {
 			throw new Exception("There are still unpaid balances in the ledger. Please settle account.");	
 		} 

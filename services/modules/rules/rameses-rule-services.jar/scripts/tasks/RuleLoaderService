@@ -37,26 +37,63 @@ class RuleLoaderService {
 	
 	private void loadRulesImpl(tsk) {
 		//def rulesets = ruleDB.getRulesets()*.name;
-		
 		//we retrieve rulesets based on the loaded folders so it will be pluggable.
-		final def rulesets = new HashSet();
-		def h = { m->
-			rulesets << m.filename;
+
+		def rulesetConf = [:];
+		loadConfs( rulesetConf ); 
+
+		def rulesetFiles = [];
+		def rulesetFileHandler = { m->
+			def path = m.url.getFile().replaceAll("/+", "/");
+			int idx = path.lastIndexOf( "/rulesets/" ); 
+			m.group = path.substring(0, idx); 
+
+			def conf = rulesetConf.get( m.group ); 
+			rulesetFiles << [
+				groupname: m.group,
+				filename: m.filename, 
+				sortorder: ( conf?.sortorder ? conf.sortorder : 100 )
+			];
 		} as ScanFileFilter;
-		appContext.scanFiles( "rulesets", h, null);
+
+		appContext.scanFiles( "rulesets", rulesetFileHandler, null );
+		rulesetFiles.unique(); 
+		rulesetConf.clear(); 
+
+		def list = []; 
+		def groups = rulesetFiles.groupBy{ it.sortorder }
+		groups.each{ k,v-> 
+			list << k; 
+		}
+		rulesetFiles.clear(); 
+
+		def rulesets = []; 
+
+		list.unique().sort{ it } 
+		list.each{ idx-> 
+			groups.get( idx ).sort{ it.groupname }  
+			groups.get( idx ).groupBy{ it.groupname }.each{ k,v-> 
+				v.sort{ it.filename } 
+				v.each{ 
+					rulesets << it.filename; 
+				}
+			}
+		}
+		groups.clear();
+		list.clear();
 
 		def readers = null;
 		def loadrules = { m->
 			try {
 				readers << new InputStreamReader(m.url.openStream());
 			}
-			catch(e) {println "error load " + e.message; }
+			catch( Throwable t ) { 
+				println "error load " + e.message; 
+			}
 		} as ScanFileFilter;
 		
 		//loading rule sequence. file facts and rules. db rules
-		def rsets = []; 
-		rulesets.each{ rsets << it }
-		rsets.sort{ it }.each { rs->
+		rulesets.each { rs->
 			println "loading rule " + rs;
 			readers = [];
 
@@ -79,7 +116,31 @@ class RuleLoaderService {
 				ruleSvc.buildRuleContext(rs, readers); 
 			} catch(Throwable e) {
 				e.printStackTrace();
-			} 		
+			} 
+
+			readers.clear(); 
 		}
-	}	
+		rulesets.clear(); 
+	} 
+
+	void loadConfs( def map ) {
+		def getProps = { url-> 
+			def props = new Properties();
+			try { 
+				props.load( url.openStream() ); 
+				props.sortorder = Integer.parseInt( props.get("sortorder").toString()); 
+			} 
+			catch(Throwable t) { 
+				props.sortorder = 100;
+			} 
+			return props;
+		}
+
+		appContext.getClassLoader().getResources( "ruleset.conf" ).each{ url-> 
+			def path = url.getFile().replaceAll("/+", "/");
+			int idx = path.lastIndexOf('/'); 
+			def name = path.substring(0, idx); 
+			map.put(name, getProps( url )); 
+		}
+	}
 }

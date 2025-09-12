@@ -4,8 +4,8 @@ import java.rmi.server.*;
 
 class BusinessApplicationUnifiedForm3Service  {
 
-    @Service("BusinessMasterService")
-    def bizSvc;
+	@Service("BusinessMasterService")
+	def bizSvc;
 
     @Service("LOVService")
     def LOV;
@@ -51,7 +51,7 @@ class BusinessApplicationUnifiedForm3Service  {
     }
 
     @ProxyMethod
-    public def getReport( o ) {
+	public def getReport( o ) {
         def app = appSvc.open( o );
 
         def p =[:];
@@ -95,6 +95,6 @@ class BusinessApplicationUnifiedForm3Service  {
         app.approvertitle = app.approver?.title;
 
         return app;
-    }
+	}
 
 } 

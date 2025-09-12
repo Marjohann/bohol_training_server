@@ -16,3 +16,9 @@ from online_business_application oa
 	inner join business b on b.objid = oa.business_objid 
 	inner join business_application a on a.objid = oa.objid 
 where a.objid = $P{objid} 
+
+
+[findOpenCount]
+select count(*) as txncount
+from online_business_application 
+where state = 'OPEN' 

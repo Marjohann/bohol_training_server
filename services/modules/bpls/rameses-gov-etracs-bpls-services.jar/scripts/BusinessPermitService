@@ -165,7 +165,7 @@ class BusinessPermitService  {
 		if ( !app ) throw new Exception('Application record does not exist'); 
 
 		def varvalue = sysvar.getProperty( 'businesspermit_split_printing', null );  
-		boolean splitPrinting = ( "true" == varvalue.toString() ); 
+		boolean splitPrinting = varvalue.toString().matches('true|1'); 
 
 		def stateFilters = ['COMPLETED'];
 		varvalue = sysvar.getProperty( 'businesspermit_issuance_on_release', null );  
@@ -192,8 +192,10 @@ class BusinessPermitService  {
 		if ( splitPrinting ) { 
 			lobs = lobSvc.getAppLobs( o ); 
 			lobs = lobs.findAll{( it.assessmenttype.toString().toUpperCase() != 'RETIRE' )} 
-		} else {
-			lobs = permitlob_db.find([ parentid: perm.objid ]).orderBy(' txndate ').list(); 
+		} 
+		else {
+			def permitLob_Em = dynaEm.lookup('vw_business_permit_lob'); 
+			lobs = permitLob_Em.find([ parentid: perm.objid ]).orderBy(' txndate ').list(); 
 		} 
 
 		if ( !lobs ) throw new Exception('No available active LOB'); 

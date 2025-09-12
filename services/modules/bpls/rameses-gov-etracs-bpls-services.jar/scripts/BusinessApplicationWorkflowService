@@ -57,8 +57,13 @@ public class BusinessApplicationWorkflowService extends ActiveWorkflowService {
 		* if current state is not assign assessor which is a group, do not  
 		* remove message. All else remove message when opening the document.
 		*******************************************************************/
-		if ( task.state != 'assign-assessor' ) {
-			notificationService.removeMessage([objid: task.objid]);
+		if ( !task.state.toString().startsWith('assign-')) {
+			
+			notificationService.removeMessage([ objid: task.objid ]);
+
+			taskDB.getClosedTasks([ refid: task.refid ]).each{ 
+				notificationService.removeMessage([ objid: it.objid ]);
+			}
 		}
 	}
 
@@ -264,6 +269,9 @@ public class BusinessApplicationWorkflowService extends ActiveWorkflowService {
 	* if the submitter is not the owner. DO NOT USE result.task. This is not yet reliable. 
 	********************************************************************************************/
 	void afterSignal( def result ) {
+		
+		def newTaskState = result.task?.state.toString().toLowerCase(); 
+
 		def data = env.data;
 		def prevtask = env.prevtask;
 		if ( prevtask?.state == 'assign-assessor') {
@@ -272,12 +280,34 @@ public class BusinessApplicationWorkflowService extends ActiveWorkflowService {
 		else if ( prevtask?.state == 'assessment') {
 			result.approver = data.approver;	
 		}
+		else if ( prevtask?.state == 'payment') {
+			def task = taskDB.findTask([ processid: prevtask.objid ]); 
+			def openTask = taskDB.findOpenForkTask([ refid: task.refid, parentprocessid: task.parentprocessid ]); 
+			if ( openTask ) { 
+				// do nothing, if there is still an open task
+			}
+			else { 
+				if ( newTaskState == 'release' && task.parentprocessid ) { 
+					ba.update([ objid: task.refid, state: 'RELEASE' ]); 
+					self.notifyChangeAppState([ objid: task.refid, state: newTaskState.toUpperCase() ]); 
+				}
+			}
+		}
+
+		def refid = result.task?.refid; 
+		if ( !refid ) refid = prevtask?.refid; 
+
+		if ( refid ) {
+			taskDB.getClosedTasks([ refid: refid ]).each{ 
+				notificationService.removeMessage([ objid: it.objid ]);
+			} 
+		}
 
 		if ( result.task ) {
 			def lockinfo = [ refid: result.task.refid, state: result.task.state ]; 
 			lockDB.where('refid = :refid', lockinfo).delete(); 
 			lockDB.create( lockinfo ); 
-		}
+		} 
 	}
 
 	void onEndTask() {
@@ -357,9 +387,15 @@ public class BusinessApplicationWorkflowService extends ActiveWorkflowService {
 		map.message = map.message + (env.TASK_MESSAGE==null? '':env.TASK_MESSAGE); 
 
 	    //remove previous notifications if any to ensure it is clean
-	    if(prevtask?.objid) {
+	    if ( prevtask?.objid ) {
 	    	notificationService.removeMessage([objid: prevtask.objid]);
 	    }
+
+	    if ( prevtask?.refid ) {
+			taskDB.getClosedTasks([ refid: prevtask.refid ]).each{ 
+				notificationService.removeMessage([ objid: it.objid ]);
+			} 
+	    } 
 
 	    //notify-map
 	    if( map!=null) {

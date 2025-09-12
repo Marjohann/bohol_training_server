@@ -13,5 +13,4 @@ class BPLobListingReportService
 		if( ! list ) throw new Exception('No records found.');
 		return list;
 	}
-
 }

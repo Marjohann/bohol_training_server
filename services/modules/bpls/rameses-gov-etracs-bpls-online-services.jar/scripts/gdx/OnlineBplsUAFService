@@ -62,12 +62,27 @@ class OnlineBplsUAFService {
 			business.owner.phoneno = business.owner.contact.remove('phoneno');
 		}
 
+		def owner_gender = business.owner?.gender; 
+		if ( owner_gender.toString().toUpperCase().matches('M|MALE')) {
+			business.owner.gender = 'M'; 
+		}
+		else if ( owner_gender.toString().toUpperCase().matches('F|FEMALE')) {
+			business.owner.gender = 'F'; 
+		}
+
 		if ( !business.owner.sss ) {
 			def idinfo = business.owner.id;
 			if ( idinfo instanceof Map ) {
 				def idtype = idinfo.type?.name.toString().toUpperCase(); 
 				if ( idtype == 'SSS' ) business.owner.sss = idinfo.idno;				
 			}
+		}
+
+		def officetype = app.remove('officetype'); 
+		if ( officetype ) {
+			business.officetype = officetype.toString().toUpperCase(); 
+		} else {
+			business.officetype = 'MAIN'; 
 		}
 
 		app.business = business; 

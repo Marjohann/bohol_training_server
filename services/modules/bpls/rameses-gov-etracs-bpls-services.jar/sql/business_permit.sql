@@ -99,7 +99,7 @@ select
 	(SELECT photo FROM entityindividual WHERE objid=b.owner_objid) AS photo, 
 	(select citizenship from entityindividual where objid=b.owner_objid) AS citizenship, 
 	(select civilstatus from entityindividual where objid=b.owner_objid) AS civilstatus, 
-	ba.parentapplicationid, b.orgtype   
+	ba.parentapplicationid, b.orgtype, b.mobileno, b.phoneno, b.email 
 from business_application ba 
 	inner join business_permit bp on bp.objid=ba.permit_objid 
 	inner join business b on bp.businessid=b.objid 
@@ -116,7 +116,7 @@ select
 	(select photo from entityindividual where objid=b.owner_objid) AS photo, 
 	(select citizenship from entityindividual where objid=b.owner_objid) AS citizenship, 
 	(select civilstatus from entityindividual where objid=b.owner_objid) AS civilstatus, 
-	b.orgtype  
+	b.orgtype, b.mobileno, b.phoneno, b.email 
 from ( 
 	select objid as appid from business_application 
 	where objid=$P{applicationid} and state in (${statefilter})
@@ -138,23 +138,25 @@ SELECT * FROM business_address WHERE objid=$P{objid}
 [getApplicationLOBs]
 select 
 	bal.objid, bal.applicationid, bal.businessid, ba.txndate,  
-	bal.lobid, bal.name, bal.assessmenttype 
+	bal.lobid, bal.name, bal.assessmenttype, 
+	lob.psic_code, lob.psic_description 
 from ( 
 	select 
 		bal.businessid, bal.activeyear, bal.lobid, max(ba.txndate) as txndate 
 	from business_application o 
-		inner join business_application_lob bal on o.business_objid=bal.businessid 
-		inner join business_application ba on bal.applicationid=ba.objid 
-	where o.objid=$P{applicationid} 
-		and bal.activeyear=o.appyear  
+		inner join business_application_lob bal on bal.businessid = o.business_objid 
+		inner join business_application ba on ba.objid = bal.applicationid 
+	where o.objid = $P{applicationid} 
+		and bal.activeyear = o.appyear  
 		and ba.state in ('RELEASE','COMPLETED') 
 	group by bal.businessid, bal.activeyear, bal.lobid 
 )xx 
-	inner join business_application_lob bal on xx.businessid=bal.businessid 
-	inner join business_application ba on bal.applicationid=ba.objid 
-where bal.activeyear=xx.activeyear 
-	and bal.lobid=xx.lobid 
-	and ba.txndate=xx.txndate 
+	inner join business_application_lob bal on bal.businessid = xx.businessid 
+	inner join business_application ba on ba.objid = bal.applicationid 
+	left join vw_lob lob on lob.objid = bal.lobid 
+where bal.activeyear = xx.activeyear 
+	and bal.lobid = xx.lobid 
+	and ba.txndate = xx.txndate 
 	and bal.assessmenttype in ('NEW','RENEW') 
 order by ba.txndate, bal.name 
 
@@ -180,11 +182,15 @@ update business_permit set remarks=$P{remarks} where objid=$P{objid}
 [getAppLOBs]
 select 
 	alob.objid, alob.businessid, alob.applicationid, a.appyear, 
-	a.apptype, a.txndate, a.dtfiled, alob.lobid, alob.name  
+	a.apptype, a.txndate, a.dtfiled, alob.lobid, alob.name, 
+	lob.psic_code, lob.psic_description 
 from business_permit p 
-	inner join business_application pa on p.applicationid=pa.objid 
-	inner join business_application a on (a.business_objid=p.businessid and a.appyear=pa.appyear)
-	inner join business_application_lob alob on alob.applicationid=a.objid 
+	inner join business_application pa on p.applicationid = pa.objid 
+	inner join business_application a on ( 
+		a.business_objid = p.businessid and a.appyear = pa.appyear
+	) 
+	inner join business_application_lob alob on alob.applicationid = a.objid 
+	left join vw_lob lob on lob.objid = alob.lobid 
 where p.objid = $P{permitid}  
 	and a.state = 'COMPLETED' 
 	and a.txndate <= pa.txndate 

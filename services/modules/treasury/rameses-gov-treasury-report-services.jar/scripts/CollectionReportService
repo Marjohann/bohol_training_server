@@ -201,34 +201,30 @@ class CollectionReportService  {
 
 		params.postingtypeid = params.postingtype.objid; 
 
-		def funds = adb.getFundSummary( params ); 
-		if ( !funds ) throw new Exception('No available record(s) found that matches your criteria'); 
-
-		def subqry = [];
-		def sqlqry = [];
-		def header = [:];
-		def colindex = 0;
-		funds.each {
-			subqry << "( select SUM(amount) from remittance_fund where objid = rf.objid and fund_objid='${it.fundid}' ) as col${colindex}";
-			sqlqry << " sum( col${colindex} ) as col${colindex} ";
-			header['COL'+ colindex] = it.title;
-			colindex++; 
-		} 
-		params.subqry = subqry.join(", ");
-		params.sqlqry = sqlqry.join(", ");
-
 		def items = adb.getReportSummary( params ); 
 		if ( !items ) throw new Exception('No available record(s) found that matches your criteria'); 
 
-		def dtbean = new DateBean( startdate ); 
-		while ( enddate.after( dtbean.date )) {
-			def day = dtbean.day; 
-			def itm = items.find{ it.xdate == day } 
-			if ( !itm ) items << [ xdate: day ]; 
+		def funds = items.collect{ it.fund }.unique(); 
+		funds.sort{ it.title }
 
+		def header = [:];
+		funds.eachWithIndex{ o,idx-> 
+			header['COL'+ idx] = o.title;
+		}
+
+		def list = []; 
+		def dtbean = new DateBean( startdate ); 
+		while ( enddate.after( dtbean.date ) || enddate == dtbean.date ) {
+			def day = dtbean.day; 
+			def itm = [ xdate: day ];
+			funds.eachWithIndex{ o,idx-> 
+				def sublist = items.findAll{( it.xdate == itm.xdate && it.fund?.objid == o.objid )} 
+				def total = sublist.collect{ it.amount }.sum{( it ? it : 0.0 )} 
+				itm['col'+ idx] = total; 
+			} 
+			list << itm; 
 			dtbean.add("1d"); 
 		}
-		items.sort{ ((Number) it.xdate).intValue() } 
 
 		def periodtype = params.period.type;
 		if ( !params.period.title ) 
@@ -244,7 +240,7 @@ class CollectionReportService  {
 			POSTINGTYPE_FILTER : params.postingtype.title.toUpperCase(), 
 			COLLECTOR_FILTER   : ( params.collectorid == '%' ? 'ALL COLLECTORS' : collectorname )
 		]); 
-		return [ header: header, reportdata: items ]; 
+		return [ header: header, reportdata: list ]; 
 	}
 
 
