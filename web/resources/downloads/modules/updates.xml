@@ -1,21 +1,21 @@
 <app>
 <env>
 app.title=ETRACS 2.5 build 2.5.05.03-20 (${lgu_name})
-app.host=${app_server_ip}:18070
+app.host=192.168.254.107:18070
 app.cluster=osiris3
 app.context=etracs25
-app.help=http://${app_server_ip}:18080/help
+app.help=192.168.254.107:18080/help
 app.loader=com.rameses.osiris2.client.OsirisAppLoader
 readTimeout=300000
 connectionTimeout=5000
 filemgmt.enabled=false
 
-ws.host=${app_server_ip}:18060
-#res.host=${app_server_ip}
+ws.host=192.168.254.107:18060
+#res.host=192.168.254.107
 
-socketio.host=${socketio_server_ip}:7080
+socketio.host=192.168.254.107:7080
 
-admin.app.host=${app_server_ip}:18070
+admin.app.host=192.168.254.107:18070
 admin.app.context=etracs25
 </env>
 <modules>
