@@ -1,6 +1,6 @@
 <app>
 <env>
-app.title=ETRACS 2.5 build 2.5.05.03-17 (${lgu_name})
+app.title=ETRACS 2.5 build 2.5.05.03-20 (${lgu_name})
 app.host=${app_server_ip}:18070
 app.cluster=osiris3
 app.context=etracs25
@@ -13,7 +13,10 @@ filemgmt.enabled=false
 ws.host=${app_server_ip}:18060
 #res.host=${app_server_ip}
 
-socketio.host=${app_server_ip}:7080
+socketio.host=${socketio_server_ip}:7080
+
+admin.app.host=${app_server_ip}:18070
+admin.app.context=etracs25
 </env>
 <modules>
    <module version="1.00" file="libs/commons-net-3.5.jar"  />
@@ -30,10 +33,12 @@ socketio.host=${app_server_ip}:7080
 
    <import file="treasury/updates.pxml"/> 
 
-   <import file="rptis/updates.pxml"/> 
+   <import file="epayment/updates.pxml"/> 
+
+   <import file="queue/updates.pxml"/>
 
    <import file="bpls/updates.pxml"/>   
 
-   <import file="queue/updates.pxml"/> 
+   <import file="rptis/updates.pxml"/> 
 </modules>
 </app>
