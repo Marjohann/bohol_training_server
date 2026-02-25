@@ -109,7 +109,8 @@ class UserQueueService {
 			notify([ 
 				counterid: o.counterid, sectionid: o.sectionid, groupid: a.groupid, 
 				seriesno: m.seriesno, ticketno: dd.ticketno, prefix: a.prefix, 
-				type:'TAKE_NUMBER', countercode: dd.counter?.code  
+				type:'TAKE_NUMBER', countercode: dd.counter?.code, 
+				sectiontitle: a.title 
 			]); 
 		} 
 	} 
@@ -135,7 +136,8 @@ class UserQueueService {
 		notify([ 
 			counterid: o.counterid, sectionid: qsdata.objid, groupid: qndata.groupid, 
 			seriesno: qndata.seriesno, ticketno: qndata.ticketno, prefix: qsdata.prefix, 
-			type:'CONSUME_NUMBER', countercode: qcdata.code  
+			type:'CONSUME_NUMBER', countercode: qcdata.code, 
+			sectiontitle: qsdata.title   
 		]); 
 	} 
 
@@ -154,7 +156,8 @@ class UserQueueService {
 		notify([ 
 			counterid: o.counterid, sectionid: qsdata.objid, groupid: qndata.groupid, 
 			seriesno: qndata.seriesno, ticketno: qndata.ticketno, prefix: qsdata.prefix, 
-			type:'BUZZ_NUMBER', countercode: qcdata.code  
+			type:'BUZZ_NUMBER', countercode: qcdata.code, 
+			sectiontitle: qsdata.title 
 		]); 
 	} 
 
@@ -268,7 +271,8 @@ class UserQueueService {
 		notify([ 
 			counterid: qnadata.counter?.objid, sectionid: qnadata.section?.objid, 
 			groupid: qndata.groupid, ticketno: qnadata.ticketno, 
-			type:'TAKE_NUMBER', countercode: qnadata.counter?.code 
+			type:'TAKE_NUMBER', countercode: qnadata.counter?.code, 
+			sectiontitle: qnadata.section?.title  
 		]); 
 		return qnadata; 
 	} 
@@ -290,6 +294,7 @@ class UserQueueService {
 			data.ticketno = data.formattedseriesno; 
 		} 
 		self.notifyWs( data ); 
+		self.publishData( data ); 
 	} 
 
 	def formatSeriesNumber( data ) {
@@ -326,4 +331,18 @@ class UserQueueService {
             return data; 
         } 
     } 
+
+
+	@Async 
+	@ProxyMethod(local=true) 
+	public void publishData( data ) { 
+		if ( !data ) return; 
+
+		self.afterPublishData( data ); 
+	}
+
+	@ProxyMethod 
+	public void afterPublishData( data ) {
+		// to be intercepted
+	}
 } 
